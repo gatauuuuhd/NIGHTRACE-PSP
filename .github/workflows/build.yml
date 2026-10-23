@@ -1,0 +1,36 @@
+name: Build NIGHTRACE PSP
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: pspdev/pspdev:latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Build EBOOT.PBP
+        run: |
+          command -v psp-gcc
+          command -v psp-config
+          make clean
+          make
+
+      - name: Check output
+        run: |
+          test -s EBOOT.PBP
+          ls -lh EBOOT.PBP
+
+      - name: Upload PPSSPP game
+        uses: actions/upload-artifact@v4
+        with:
+          name: NIGHTRACE-EBOOT
+          path: EBOOT.PBP
+          if-no-files-found: error
+          
